@@ -1,0 +1,86 @@
+import pygame
+from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_DOWN
+from pygame.locals import K_a, K_d, K_w, K_s
+from pygame.locals import K_SPACE
+from weapons import Blaster
+import numpy as np
+from globals import Globals
+
+WIDTH, HEIGHT = 800, 600
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load('Player.png').convert()
+        self.rect = pygame.Rect(0, 0, 10, 10)
+        self.position = np.array([0.0, 0.0], dtype=float)
+        self.max_speed = 2
+        self.speed = 0.0
+        self.acceleration = 2
+        self.last_movement_vector = np.array([1.0, 0.0], dtype=float)
+        self.shooting_vector = np.array([1.0, 0.0], dtype=float)
+        self.weapon = Blaster()
+
+    def update(self, tilemap):
+        pressed_keys = pygame.key.get_pressed()
+        left = pressed_keys[K_LEFT] or pressed_keys[K_a]
+        right = pressed_keys[K_RIGHT] or pressed_keys[K_d]
+        up = pressed_keys[K_UP] or pressed_keys[K_w]
+        down = pressed_keys[K_DOWN] or pressed_keys[K_s]
+        space = pressed_keys[K_SPACE]
+
+        self.move(tilemap, left, right, up, down)
+        
+        if space:
+            self.shoot()
+    
+    def shoot(self):
+        self.weapon.shoot(self.rect.center, self.shooting_vector)
+    
+    def update_shooting_vector(self):
+        self.shooting_vector = self.last_movement_vector.copy()
+
+    def move(self, tilemap, left, right, up, down):
+        # Store the original position for collision resolution
+        original_pos = self.position.copy()
+
+        # Calculate movement vector
+        movement_vector = np.array([0.0, 0.0], dtype=float)
+
+        if left and self.rect.left > 0:
+            movement_vector[0] -= 1
+        if right and self.rect.right < WIDTH:
+            movement_vector[0] += 1
+        if up and self.rect.top > 0:
+            movement_vector[1] -= 1
+        if down and self.rect.bottom < HEIGHT:
+            movement_vector[1] += 1
+        
+        norm = np.linalg.norm(movement_vector)
+        if norm > 0:
+            movement_vector = movement_vector / norm
+            self.last_movement_vector = movement_vector.copy()
+            # Attempt to move in the x direction
+            if movement_vector[0] != 0:
+                self.position[0] += movement_vector[0]
+                self.rect.x = self.position[0]  # Update rect position
+
+                # Check for collisions in the x direction
+                if pygame.sprite.spritecollide(self, tilemap.walls, False):
+                    # Revert position in the x direction
+                    self.position[0] = original_pos[0]
+                    self.rect.x = self.position[0]
+
+            # Attempt to move in the y direction
+            if movement_vector[1] != 0:
+                self.position[1] += movement_vector[1]
+                self.rect.y = self.position[1]  # Update rect position
+
+                # Check for collisions in the y direction
+                if pygame.sprite.spritecollide(self, tilemap.walls, False):
+                    # Revert position in the y direction
+                    self.position[1] = original_pos[1]
+                    self.rect.y = self.position[1]
+
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
