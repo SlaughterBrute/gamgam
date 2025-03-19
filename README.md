@@ -19,4 +19,5 @@ This is supposed to be top down shooter game GamGam in Python using the pygame f
 <h2>Build and Run</h2>
 Developed with Python 3.12.3
 <li>pip install -r requirements.txt</li>
-<li>Run file init.py to start game</li>
+<li>Run generate_map.py<li>
+<li>Run init.py to start game</li>
