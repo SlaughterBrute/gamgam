@@ -5,23 +5,18 @@ from pygame.locals import K_SPACE
 from weapons import Blaster
 import numpy as np
 from globals import Globals
+from entities import MovingEntity
 
 WIDTH, HEIGHT = 800, 600
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load('Player.png').convert()
-        self.rect = pygame.Rect(0, 0, 10, 10)
-        self.position = np.array([0.0, 0.0], dtype=float)
-        self.max_speed = 2
-        self.speed = 0.0
-        self.acceleration = 2
+class Player(MovingEntity):
+    def __init__(self, start_x:int=0, start_y:int=0):
+        super().__init__(x=start_x, y=start_y, speed=40, image_path='Player.png', size=10)
         self.last_movement_vector = np.array([1.0, 0.0], dtype=float)
         self.shooting_vector = np.array([1.0, 0.0], dtype=float)
         self.weapon = Blaster()
 
-    def update(self, tilemap):
+    def update(self, tilemap, delta_time):
         pressed_keys = pygame.key.get_pressed()
         left = pressed_keys[K_LEFT] or pressed_keys[K_a]
         right = pressed_keys[K_RIGHT] or pressed_keys[K_d]
@@ -29,18 +24,18 @@ class Player(pygame.sprite.Sprite):
         down = pressed_keys[K_DOWN] or pressed_keys[K_s]
         space = pressed_keys[K_SPACE]
 
-        self.move(tilemap, left, right, up, down)
-        
+        self.move(tilemap, left, right, up, down, delta_time)
+
         if space:
             self.shoot()
-    
+
     def shoot(self):
         self.weapon.shoot(self.rect.center, self.shooting_vector)
     
     def update_shooting_vector(self):
         self.shooting_vector = self.last_movement_vector.copy()
 
-    def move(self, tilemap, left, right, up, down):
+    def move(self, tilemap, left, right, up, down, delta_time):
         # Store the original position for collision resolution
         original_pos = self.position.copy()
 
@@ -59,7 +54,9 @@ class Player(pygame.sprite.Sprite):
         norm = np.linalg.norm(movement_vector)
         if norm > 0:
             movement_vector = movement_vector / norm
+            movement_vector *= self.speed * delta_time
             self.last_movement_vector = movement_vector.copy()
+
             # Attempt to move in the x direction
             if movement_vector[0] != 0:
                 self.position[0] += movement_vector[0]

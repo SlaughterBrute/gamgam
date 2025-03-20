@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_DOWN
 from pygame.locals import K_a, K_d, K_w, K_s
-from pygame.locals import K_SPACE
+from pygame.locals import K_SPACE, K_ESCAPE
 import sys
 from player import Player
 from globals import Globals
@@ -33,6 +33,8 @@ def main():
     player = Player()
     enemies = pygame.sprite.Group()
     enemies.add(BasicEnemy(x=10, y=10))
+    last_time = pygame.time.get_ticks()
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -41,10 +43,17 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_SPACE:
                     player.update_shooting_vector()
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
 
-        player.update(tilemap)
+        current_time = pygame.time.get_ticks()
+        delta_time = (current_time - last_time) / 1000.0  # Convert to seconds
+        last_time = current_time
 
-        projectiles.update(tilemap.walls, enemies)
+        player.update(tilemap, delta_time)
+
+        projectiles.update(delta_time, tilemap.walls, enemies)
 
         tilemap.draw(screen)
         
