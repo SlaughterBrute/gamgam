@@ -1,11 +1,11 @@
 import pygame
 import numpy as np
 from globals import Globals
-from entities import MovingEntity
+from entities import MovingGameObject
 
-class Projectile(MovingEntity):
-    def __init__(self, x, y, direction, speed, damage, image_path):
-        super().__init__(x=x, y=y, speed=speed, image_path=image_path, width=4, height=2)
+class Projectile(MovingGameObject):
+    def __init__(self, x, y, direction, speed, damage, image_path, hitpoints):
+        super().__init__(x=x, y=y, speed=speed, image_path=image_path, hitpoints=hitpoints, width=4, height=2)
         
         self.damage = damage
         self.game_width = Globals.get('WIDTH')
@@ -39,4 +39,4 @@ class Projectile(MovingEntity):
 
 class Bullet(Projectile):
     def __init__(self, x, y, direction):
-        super().__init__(x, y, direction, speed=150, damage=1, image_path='Bullet.png')
+        super().__init__(x, y, direction, speed=150, damage=1, image_path='Bullet.png', hitpoints=10)

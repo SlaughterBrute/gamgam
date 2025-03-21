@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self, *groups, x:int, y:int, image_path:str, size:int=None, width:int=None, height:int=None):
+    def __init__(self, *groups, x:int, y:int, image_path:str, hitpoints:int, size:int=None, width:int=None, height:int=None):
         super().__init__(*groups)
         if size is not None:
             self.width = size
@@ -18,10 +18,16 @@ class GameObject(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(image, self.rect.size)
         self.rect.center = (x,y)
         self.position = np.array([x, y], dtype=float)
+        self.hitpoints = hitpoints
+    
+    def damage(self, damage:int):
+        self.hitpoints -= damage
+        if self.hitpoints <= 0:
+            self.kill()
 
-class MovingEntity(GameObject):
-    def __init__(self, *groups, x:int, y:int, speed:float, image_path:str, size:int=None, width:int=None, height:int=None):
-        super().__init__(*groups, x=x, y=y, image_path=image_path, size=size, width=width, height=height)
+class MovingGameObject(GameObject):
+    def __init__(self, *groups, x:int, y:int, speed:float, image_path:str, hitpoints:int, size:int=None, width:int=None, height:int=None):
+        super().__init__(*groups, x=x, y=y, image_path=image_path, hitpoints=hitpoints, size=size, width=width, height=height)
         self.speed = speed
 
     def move(self, direction_vector, delta_time):
@@ -30,17 +36,8 @@ class MovingEntity(GameObject):
 
     def draw(self, surface:pygame.Surface):
         surface.blit(self.image, self.rect)
+    
 
-class LivingEntity(MovingEntity):
-    def __init__(self, *groups, x:int, y:int, speed:float, size:int, image_path:str, hitpoints:int=1):
-        super().__init__(*groups, x=x, y=y, speed=speed, size=size, image_path=image_path)
-        self.hitpoints = hitpoints
-
-    def damage(self, damage:int):
-        self.hitpoints -= damage
-        if self.hitpoints <= 0:
-            self.kill()
-
-class BasicEnemy(LivingEntity):
+class BasicEnemy(MovingGameObject):
     def __init__(self, *groups, x, y):
         super().__init__(*groups, x=x, y=y, speed=40, size=10, image_path='Enemy.png', hitpoints=5)
