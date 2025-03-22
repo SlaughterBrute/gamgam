@@ -26,9 +26,18 @@ def generate_hitomezashi_pattern(row_sequence, col_sequence):
 
     return grid
 
-
-pattern = generate_hitomezashi_pattern(random_sequence(20), random_sequence(20))
-with open('map2.txt', 'w') as f:
-    for l in pattern:
-        f.write(''.join([str(num) for num in l]))
+def generate_map(width:int=20, height:int=20):
+    sequence_x = random_sequence(width)
+    sequence_y = random_sequence(height)
+    pattern = generate_hitomezashi_pattern(sequence_x, sequence_y)
+    with open('map.txt', 'w') as f:
+        f.write(''.join([str(num) for num in sequence_x]))
         f.write('\n')
+        f.write(''.join([str(num) for num in sequence_y]))
+        f.write('\n')
+        for l in pattern:
+            f.write(''.join([str(num) for num in l]))
+            f.write('\n')
+
+if __name__ == "__main__":
+    generate_map()

@@ -8,6 +8,7 @@ from globals import Globals
 from map import TileMap
 import cProfile
 from entities import BasicEnemy
+from generate_map import generate_map
 
 # Initialize Pygame
 pygame.init()
@@ -23,8 +24,11 @@ pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 # Set up colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+BACKGROUND_COLOR = (87, 203, 219) # 57cbdb
 
 def main():
+    generate_map()
+
     projectiles = pygame.sprite.Group()
     Globals.add('projectiles', projectiles)
     tilemap = TileMap()
@@ -34,7 +38,10 @@ def main():
     enemies = pygame.sprite.Group()
     enemies.add(BasicEnemy(x=10, y=10))
     last_time = pygame.time.get_ticks()
-    
+
+    screen.fill(BACKGROUND_COLOR)
+
+    tilemap.seed_info.draw(screen)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
