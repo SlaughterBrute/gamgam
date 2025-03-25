@@ -65,7 +65,7 @@ class TileMap():
             for row, tiles in enumerate(f.readlines()):
                 for col, tile in enumerate(tiles):
                     if tile != '\n':
-                        tilemap[col+1, row+1] = int(tile)
+                        tilemap[col, row] = int(tile)
         self.tilemap = tilemap
 
     def to_map_position(self, x:int, y:int) -> tuple[int, int]:
@@ -84,9 +84,9 @@ class TileMap():
 
     def init_tiles(self):
         for x, num in enumerate(self.x_seed):
-            self.seed_info.add(ZeroOneTile(num, x+1, 0))
+            self.seed_info.add(ZeroOneTile(num, x+1.5, 0))
         for y, num in enumerate(self.y_seed):
-            self.seed_info.add(ZeroOneTile(num, 0, y+1))
+            self.seed_info.add(ZeroOneTile(num, 0, y+1.5))
         for tile in self.tilemap.items():
             self.create_tile(*tile)
     

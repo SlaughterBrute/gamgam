@@ -7,8 +7,6 @@ import numpy as np
 from globals import Globals
 from entities import MovingGameObject
 
-WIDTH, HEIGHT = 800, 600
-
 class Player(MovingGameObject):
     def __init__(self, start_x:int=0, start_y:int=0):
         super().__init__(x=start_x, y=start_y, speed=40, image_path='Player.png', hitpoints=1, size=10)
@@ -44,11 +42,11 @@ class Player(MovingGameObject):
 
         if left and self.rect.left > 0:
             movement_vector[0] -= 1
-        if right and self.rect.right < WIDTH:
+        if right and self.rect.right < Globals.get('WIDTH'):
             movement_vector[0] += 1
         if up and self.rect.top > 0:
             movement_vector[1] -= 1
-        if down and self.rect.bottom < HEIGHT:
+        if down and self.rect.bottom < Globals.get('HEIGHT'):
             movement_vector[1] += 1
         
         norm = np.linalg.norm(movement_vector)

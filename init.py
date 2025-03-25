@@ -14,10 +14,11 @@ from generate_map import generate_map
 pygame.init()
 
 # Set up display
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 420, 420
 Globals.add('WIDTH', WIDTH)
 Globals.add('HEIGHT', HEIGHT)
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+game_surface = pygame.Surface((WIDTH,HEIGHT))
+screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("GamGam")
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP])
 
@@ -64,13 +65,14 @@ def main():
         projectiles.update(delta_time, tilemap.walls, enemies)
         enemies.update(delta_time)
 
-        tilemap.draw(screen)
+        tilemap.draw(game_surface)
         
-        enemies.draw(screen)
-        player.draw(screen)
-        projectiles.draw(screen)
+        enemies.draw(game_surface)
+        player.draw(game_surface)
+        projectiles.draw(game_surface)
 
         clock.tick(30)
+        screen.blit(game_surface, (20,20))
         pygame.display.update()
 
 if __name__ == "__main__":
