@@ -27,9 +27,15 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BACKGROUND_COLOR = (87, 203, 219) # 57cbdb
 
+font_size = 36
+font = pygame.font.SysFont('Arial', font_size)
+
+
 def main():
     generate_map()
 
+    score = 0
+    Globals.add('score', score)
     projectiles = pygame.sprite.Group()
     Globals.add('projectiles', projectiles)
     tilemap = TileMap()
@@ -45,6 +51,9 @@ def main():
 
     tilemap.seed_info.draw(screen)
     while True:
+        if not enemies:
+            enemies.add(BasicEnemy(x=10, y=10))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -73,6 +82,12 @@ def main():
 
         clock.tick(30)
         screen.blit(game_surface, (20,20))
+        
+        # Show score
+        text_surface = font.render(str(Globals.get('score')), True, BLACK)
+        screen.fill(WHITE, pygame.Rect(500, 500, 100, 100))
+        screen.blit(text_surface, (500,500))
+
         pygame.display.update()
 
 if __name__ == "__main__":

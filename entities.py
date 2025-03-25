@@ -44,6 +44,11 @@ class BasicEnemy(MovingGameObject):
     def __init__(self, *groups, x, y):
         super().__init__(*groups, x=x, y=y, speed=20, size=10, image_path='Enemy.png', hitpoints=5)
 
+    def kill(self):
+        score = Globals.get('score')
+        Globals.add('score', score+1)
+        super().kill()
+
     def update(self, delta_time):
         map = Globals.get('tilemap')
         player = Globals.get('player')
