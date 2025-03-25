@@ -35,6 +35,7 @@ def main():
     Globals.add('tilemap', tilemap)
     clock = pygame.time.Clock()
     player = Player()
+    Globals.add('player', player)
     enemies = pygame.sprite.Group()
     enemies.add(BasicEnemy(x=10, y=10))
     last_time = pygame.time.get_ticks()
@@ -61,6 +62,7 @@ def main():
         player.update(tilemap, delta_time)
 
         projectiles.update(delta_time, tilemap.walls, enemies)
+        enemies.update(delta_time)
 
         tilemap.draw(screen)
         

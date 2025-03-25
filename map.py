@@ -40,6 +40,7 @@ class WallTile(Tile):
         tile = GrassTile(self.x, self.y)
         tilemap:TileMap = Globals.get('tilemap')
         tilemap.ground.add(tile)
+        tilemap.tilemap[(self.x, self.y)] = 0
 
 class ZeroOneTile(Tile):
     def __init__(self, number:str, x:int, y:int):
@@ -66,6 +67,11 @@ class TileMap():
                     if tile != '\n':
                         tilemap[col+1, row+1] = int(tile)
         self.tilemap = tilemap
+
+    def to_map_position(self, x:int, y:int) -> tuple[int, int]:
+        x = int(x / 20)
+        y = int(y / 20)
+        return x, y
 
     def create_tile(self, xy, raw_type):
         x, y = xy
