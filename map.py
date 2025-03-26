@@ -68,9 +68,9 @@ class TileMap():
                         tilemap[col, row] = int(tile)
         self.tilemap = tilemap
 
-    def to_map_position(self, x:int, y:int) -> tuple[int, int]:
-        x = int(x / 20)
-        y = int(y / 20)
+    def to_map_position(self, position:tuple[int, int]) -> tuple[int, int]:
+        x = int(position[0] / 20)
+        y = int(position[1] / 20)
         return x, y
 
     def create_tile(self, xy, raw_type):

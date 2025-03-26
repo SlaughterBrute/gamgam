@@ -30,10 +30,30 @@ class Projectile(MovingGameObject):
         for group in objects_that_can_be_collided:
             collided = pygame.sprite.spritecollide(self, group, False)
             if collided:
+                hit_something = False
                 for sprite in collided:
-                    sprite.damage(self.damage)
-                self.kill()
+                    if self.is_sprite_in_front(sprite):
+                        sprite.damage(self.damage)
+                        hit_something = True
+                if hit_something:
+                    self.kill()
+
+    def is_sprite_in_front(self, sprite:pygame.sprite.Sprite):
+        instance_center = pygame.Vector2(self.rect.center)
+        sprite_center = pygame.Vector2(sprite.rect.center)
+        to_sprite = sprite_center - instance_center
+
+        if to_sprite.length() == 0:
+            return False  # Avoid division by zero
+
+        to_sprite = to_sprite.normalize()
+
         
+        dot_product = self.direction.dot(to_sprite)
+
+        # dot product > 0 means it's in front
+        return dot_product > 0
+
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
 

@@ -1,4 +1,5 @@
 import pygame
+import logging
 from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_DOWN
 from pygame.locals import K_a, K_d, K_w, K_s
 from pygame.locals import K_SPACE, K_ESCAPE
@@ -7,8 +8,12 @@ from player import Player
 from globals import Globals
 from map import TileMap
 import cProfile
-from entities import BasicEnemy
+from enemies import BasicEnemy
 from generate_map import generate_map
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
+                    datefmt='%H:%M:%S')
 
 # Initialize Pygame
 pygame.init()
@@ -43,6 +48,8 @@ def main():
     clock = pygame.time.Clock()
     player = Player()
     Globals.add('player', player)
+    players = pygame.sprite.Group()
+    players.add(player)
     enemies = pygame.sprite.Group()
     enemies.add(BasicEnemy(x=10, y=10))
     last_time = pygame.time.get_ticks()
@@ -51,6 +58,13 @@ def main():
 
     tilemap.seed_info.draw(screen)
     while True:
+        if player.hitpoints <= 0:
+            game_over_surface = font.render(f"Game Over! Score: {Globals.get('score')}", True, BLACK)
+            screen.blit(game_over_surface, (200,200))
+            pygame.display.update()
+            pygame.time.delay(4000)
+            pygame.quit()
+            sys.exit()
         if not enemies:
             enemies.add(BasicEnemy(x=10, y=10))
 
@@ -71,7 +85,7 @@ def main():
 
         player.update(tilemap, delta_time)
 
-        projectiles.update(delta_time, tilemap.walls, enemies)
+        projectiles.update(delta_time, tilemap.walls, enemies, players)
         enemies.update(delta_time)
 
         tilemap.draw(game_surface)
@@ -84,9 +98,13 @@ def main():
         screen.blit(game_surface, (20,20))
         
         # Show score
-        text_surface = font.render(str(Globals.get('score')), True, BLACK)
-        screen.fill(WHITE, pygame.Rect(500, 500, 100, 100))
-        screen.blit(text_surface, (500,500))
+        score_surface = font.render(f"Score: {Globals.get('score')}", True, BLACK)
+        screen.fill(BACKGROUND_COLOR, pygame.Rect(500, 500, 200, 100))
+        screen.blit(score_surface, (500,500))
+
+        hitpoints_surface = font.render(f'Lives: {player.hitpoints}', True, BLACK)
+        screen.fill(BACKGROUND_COLOR, pygame.Rect(500, 400, 200, 100))
+        screen.blit(hitpoints_surface, (500,400))
 
         pygame.display.update()
 
