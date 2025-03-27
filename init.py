@@ -10,6 +10,7 @@ from map import TileMap
 import cProfile
 from enemies import BasicEnemy
 from generate_map import generate_map
+from keybindings import Keybindings
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
@@ -38,6 +39,7 @@ font = pygame.font.SysFont('Arial', font_size)
 
 def main():
     generate_map()
+    keybindings = Keybindings()
 
     score = 0
     Globals.add('score', score)
@@ -73,9 +75,9 @@ def main():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == K_SPACE:
+                if event.key == keybindings.keyboard['attack']:
                     player.update_shooting_vector()
-                if event.key == K_ESCAPE:
+                if event.key == keybindings.keyboard['exit']:
                     pygame.quit()
                     sys.exit()
 

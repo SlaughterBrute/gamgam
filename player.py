@@ -6,6 +6,7 @@ from weapons import Blaster
 import numpy as np
 from globals import Globals
 from entities import MovingGameObject
+from keybindings import Keybindings
 
 class Player(MovingGameObject):
     def __init__(self, start_x:int=0, start_y:int=0):
@@ -13,18 +14,19 @@ class Player(MovingGameObject):
         self.last_movement_vector = np.array([1.0, 0.0], dtype=float)
         self.shooting_vector = np.array([1.0, 0.0], dtype=float)
         self.weapon = Blaster()
+        self.keybindings = Keybindings()
 
     def update(self, tilemap, delta_time):
         pressed_keys = pygame.key.get_pressed()
-        left = pressed_keys[K_LEFT] or pressed_keys[K_a]
-        right = pressed_keys[K_RIGHT] or pressed_keys[K_d]
-        up = pressed_keys[K_UP] or pressed_keys[K_w]
-        down = pressed_keys[K_DOWN] or pressed_keys[K_s]
-        space = pressed_keys[K_SPACE]
+        left = pressed_keys[self.keybindings.keyboard['move_left']]
+        right = pressed_keys[self.keybindings.keyboard['move_right']]
+        up = pressed_keys[self.keybindings.keyboard['move_up']]
+        down = pressed_keys[self.keybindings.keyboard['move_down']]
+        attack = pressed_keys[self.keybindings.keyboard['attack']]
 
         self.move(tilemap, left, right, up, down, delta_time)
 
-        if space:
+        if attack:
             self.shoot()
 
     def shoot(self):
