@@ -19,8 +19,7 @@ class Player(MovingGameObject):
     def update(self, pressed_keys, joysticks, tilemap, delta_time):
 
         if joysticks:
-            # Controller keys
-            # TODO: Handle when outside or close to edge, maybe in 'move' for both
+            # Controller input
             joystick = joysticks[0]
             x = joystick.get_axis(0)
             y = joystick.get_axis(1)
@@ -28,14 +27,10 @@ class Player(MovingGameObject):
             self.move(tilemap, movement_vector, delta_time)
 
             # Attack
-            left_trigger = joystick.get_axis(4)
-            right_trigger = joystick.get_axis(5)
-            if right_trigger > 0:
-                attack = True
-            else:
-                attack = False
+            attack = any(getattr(joystick, f'get_{input_type}')(id) > 0 for
+                         (input_type, id) in self.keybindings.controller['attack'])
             
-        else:
+        else:   
             # Keyboard keys
             left = pressed_keys[self.keybindings.keyboard['move_left']]
             right = pressed_keys[self.keybindings.keyboard['move_right']]
