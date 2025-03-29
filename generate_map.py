@@ -30,7 +30,7 @@ def generate_map(width:int=20, height:int=20):
     sequence_x = random_sequence(width)
     sequence_y = random_sequence(height)
     pattern = generate_hitomezashi_pattern(sequence_x, sequence_y)
-    with open('map.txt', 'w') as f:
+    with open('map.gamefile', 'w') as f:
         f.write(''.join([str(num) for num in sequence_x]))
         f.write('\n')
         f.write(''.join([str(num) for num in sequence_y]))
