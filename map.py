@@ -59,7 +59,7 @@ class TileMap():
     
     def _load_tilemap(self):
         tilemap = {}
-        with open('map.txt', 'r') as f:
+        with open('map.gamefile', 'r') as f:
             self.x_seed = f.readline().removesuffix('\n')
             self.y_seed = f.readline().removesuffix('\n')
             for row, tiles in enumerate(f.readlines()):
