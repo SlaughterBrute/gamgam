@@ -73,8 +73,14 @@ def main():
             enemies.add(BasicEnemy(x=10, y=10))
 
         for event in pygame.event.get():
+            if event.type == pygame.JOYBALLMOTION:
+                logging.inf(f'Ball: {event}')
+            if event.type == pygame.JOYHATMOTION:
+                logging.inf(f'Hat: {event}')
             if event.type == pygame.JOYAXISMOTION:
-                logging.info(event)
+                logging.info(f'Axis: {event}')
+            if event.type == pygame.JOYBUTTONDOWN:
+                logging.info(f'Pressed: {event}')
             if event.type == pygame.JOYDEVICEADDED:
                 joysticks.append(pygame.joystick.Joystick(event.device_index))
                 logging.info(f'Addded: {event}')

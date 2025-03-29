@@ -26,7 +26,14 @@ class Player(MovingGameObject):
             y = joystick.get_axis(1)
             movement_vector = np.array([x, y], dtype=float)
             self.move(tilemap, movement_vector, delta_time)
-            attack = joystick.get_button(0)
+
+            # Attack
+            left_trigger = joystick.get_axis(4)
+            right_trigger = joystick.get_axis(5)
+            if right_trigger > 0:
+                attack = True
+            else:
+                attack = False
             
         else:
             # Keyboard keys
