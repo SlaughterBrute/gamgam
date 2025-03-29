@@ -16,15 +16,33 @@ class Player(MovingGameObject):
         self.weapon = Blaster()
         self.keybindings = Keybindings()
 
-    def update(self, tilemap, delta_time):
-        pressed_keys = pygame.key.get_pressed()
-        left = pressed_keys[self.keybindings.keyboard['move_left']]
-        right = pressed_keys[self.keybindings.keyboard['move_right']]
-        up = pressed_keys[self.keybindings.keyboard['move_up']]
-        down = pressed_keys[self.keybindings.keyboard['move_down']]
-        attack = pressed_keys[self.keybindings.keyboard['attack']]
+    def update(self, pressed_keys, joysticks, tilemap, delta_time):
 
-        self.move(tilemap, left, right, up, down, delta_time)
+        if joysticks:
+            # Controller keys
+            # TODO: Handle when outside or close to edge, maybe in 'move' for both
+            joystick = joysticks[0]
+            x = joystick.get_axis(0)
+            y = joystick.get_axis(1)
+            movement_vector = np.array([x, y], dtype=float)
+            self.move(tilemap, movement_vector, delta_time)
+
+            # Attack
+            left_trigger = joystick.get_axis(4)
+            right_trigger = joystick.get_axis(5)
+            if right_trigger > 0:
+                attack = True
+            else:
+                attack = False
+            
+        else:
+            # Keyboard keys
+            left = pressed_keys[self.keybindings.keyboard['move_left']]
+            right = pressed_keys[self.keybindings.keyboard['move_right']]
+            up = pressed_keys[self.keybindings.keyboard['move_up']]
+            down = pressed_keys[self.keybindings.keyboard['move_down']]
+            attack = pressed_keys[self.keybindings.keyboard['attack']]
+            self._move_keyboard(tilemap, left, right, up, down, delta_time)
 
         if attack:
             self.shoot()
@@ -35,10 +53,7 @@ class Player(MovingGameObject):
     def update_shooting_vector(self):
         self.shooting_vector = self.last_movement_vector.copy()
 
-    def move(self, tilemap, left, right, up, down, delta_time):
-        # Store the original position for collision resolution
-        original_pos = self.position.copy()
-
+    def _move_keyboard(self, tilemap, left, right, up, down, delta_time):
         # Calculate movement vector
         movement_vector = np.array([0.0, 0.0], dtype=float)
 
@@ -50,34 +65,39 @@ class Player(MovingGameObject):
             movement_vector[1] -= 1
         if down and self.rect.bottom < Globals.get('HEIGHT'):
             movement_vector[1] += 1
-        
+
         norm = np.linalg.norm(movement_vector)
         if norm > 0:
             movement_vector = movement_vector / norm
-            movement_vector *= self.speed * delta_time
-            self.last_movement_vector = movement_vector.copy()
+            self.move(tilemap, movement_vector, delta_time)
 
-            # Attempt to move in the x direction
-            if movement_vector[0] != 0:
-                self.position[0] += movement_vector[0]
-                self.rect.x = self.position[0]  # Update rect position
+    def move(self, tilemap, movement_vector, delta_time):
+        original_pos = self.position.copy()
 
-                # Check for collisions in the x direction
-                if pygame.sprite.spritecollide(self, tilemap.walls, False):
-                    # Revert position in the x direction
-                    self.position[0] = original_pos[0]
-                    self.rect.x = self.position[0]
+        movement_vector *= self.speed * delta_time
+        self.last_movement_vector = movement_vector.copy()
 
-            # Attempt to move in the y direction
-            if movement_vector[1] != 0:
-                self.position[1] += movement_vector[1]
-                self.rect.y = self.position[1]  # Update rect position
+        # Attempt to move in the x direction
+        if movement_vector[0] != 0:
+            self.position[0] += movement_vector[0]
+            self.rect.x = self.position[0]  # Update rect position
 
-                # Check for collisions in the y direction
-                if pygame.sprite.spritecollide(self, tilemap.walls, False):
-                    # Revert position in the y direction
-                    self.position[1] = original_pos[1]
-                    self.rect.y = self.position[1]
+            # Check for collisions in the x direction
+            if pygame.sprite.spritecollide(self, tilemap.walls, False):
+                # Revert position in the x direction
+                self.position[0] = original_pos[0]
+                self.rect.x = self.position[0]
+
+        # Attempt to move in the y direction
+        if movement_vector[1] != 0:
+            self.position[1] += movement_vector[1]
+            self.rect.y = self.position[1]  # Update rect position
+
+            # Check for collisions in the y direction
+            if pygame.sprite.spritecollide(self, tilemap.walls, False):
+                # Revert position in the y direction
+                self.position[1] = original_pos[1]
+                self.rect.y = self.position[1]
 
     def draw(self, surface: pygame.Surface):
         surface.blit(self.image, self.rect)
