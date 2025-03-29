@@ -9,7 +9,7 @@ from entities import MovingGameObject
 from keybindings import Keybindings
 
 class Player(MovingGameObject):
-    def __init__(self, start_x:int=0, start_y:int=0):
+    def __init__(self, start_x:int=5, start_y:int=5):
         super().__init__(x=start_x, y=start_y, speed=40, image_path='Player.png', hitpoints=10, size=10)
         self.last_movement_vector = np.array([1.0, 0.0], dtype=float)
         self.shooting_vector = np.array([1.0, 0.0], dtype=float)
@@ -57,13 +57,13 @@ class Player(MovingGameObject):
         # Calculate movement vector
         movement_vector = np.array([0.0, 0.0], dtype=float)
 
-        if left and self.rect.left > 0:
+        if left:
             movement_vector[0] -= 1
-        if right and self.rect.right < Globals.get('WIDTH'):
+        if right:
             movement_vector[0] += 1
-        if up and self.rect.top > 0:
+        if up:
             movement_vector[1] -= 1
-        if down and self.rect.bottom < Globals.get('HEIGHT'):
+        if down:
             movement_vector[1] += 1
 
         norm = np.linalg.norm(movement_vector)
@@ -82,8 +82,11 @@ class Player(MovingGameObject):
             self.position[0] += movement_vector[0]
             self.rect.x = self.position[0]  # Update rect position
 
-            # Check for collisions in the x direction
-            if pygame.sprite.spritecollide(self, tilemap.walls, False):
+            if movement_vector[0] < 0:
+                within_map = 0 <= self.rect.left
+            else:
+                within_map = self.rect.right <= Globals.get('WIDTH')
+            if not within_map or pygame.sprite.spritecollide(self, tilemap.walls, False):
                 # Revert position in the x direction
                 self.position[0] = original_pos[0]
                 self.rect.x = self.position[0]
@@ -93,8 +96,11 @@ class Player(MovingGameObject):
             self.position[1] += movement_vector[1]
             self.rect.y = self.position[1]  # Update rect position
 
-            # Check for collisions in the y direction
-            if pygame.sprite.spritecollide(self, tilemap.walls, False):
+            if movement_vector[1]:
+                within_map = 0 <= self.rect.top
+            else:
+                within_map = self.rect.bottom <= Globals.get('HEIGHT')
+            if not within_map or pygame.sprite.spritecollide(self, tilemap.walls, False):
                 # Revert position in the y direction
                 self.position[1] = original_pos[1]
                 self.rect.y = self.position[1]

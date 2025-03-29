@@ -72,6 +72,11 @@ class TileMap():
         x = int(position[0] / 20)
         y = int(position[1] / 20)
         return x, y
+    
+    def map_position_to_normal_postion_center_of_tile(self, position:tuple[int, int]) -> tuple[int, int]:
+        x = int(position[0] * 20 + 20/2)
+        y = int(position[1] * 20 + 20/2)
+        return x, y
 
     def create_tile(self, xy, raw_type):
         x, y = xy
