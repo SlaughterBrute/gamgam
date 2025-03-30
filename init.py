@@ -18,6 +18,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 # Initialize Pygame
 pygame.init()
+pygame.joystick.init()
 
 # Set up display
 WIDTH, HEIGHT = 420, 420
@@ -36,10 +37,12 @@ BACKGROUND_COLOR = (87, 203, 219) # 57cbdb
 font_size = 36
 font = pygame.font.SysFont('Arial', font_size)
 
+joysticks = []
 
 def main():
     generate_map()
     keybindings = Keybindings()
+    keybindings.controller['attack'].add_binding('axis', 5)
 
     score = 0
     Globals.add('score', score)
@@ -71,6 +74,11 @@ def main():
             enemies.add(BasicEnemy(x=10, y=10))
 
         for event in pygame.event.get():
+            if event.type == pygame.JOYDEVICEADDED:
+                joysticks.append(pygame.joystick.Joystick(event.device_index))
+                logging.info(f'Addded: {event}')
+            if event.type == pygame.JOYDEVICEREMOVED:
+                logging.info(f'Should be removed: {event}')
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -81,11 +89,12 @@ def main():
                     pygame.quit()
                     sys.exit()
 
+        pressed_keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
         delta_time = (current_time - last_time) / 1000.0  # Convert to seconds
         last_time = current_time
 
-        player.update(tilemap, delta_time)
+        player.update(pressed_keys, joysticks, tilemap, delta_time)
 
         projectiles.update(delta_time, tilemap.walls, enemies, players)
         enemies.update(delta_time)

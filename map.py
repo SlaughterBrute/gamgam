@@ -59,7 +59,7 @@ class TileMap():
     
     def _load_tilemap(self):
         tilemap = {}
-        with open('map.txt', 'r') as f:
+        with open('map.gamefile', 'r') as f:
             self.x_seed = f.readline().removesuffix('\n')
             self.y_seed = f.readline().removesuffix('\n')
             for row, tiles in enumerate(f.readlines()):
@@ -71,6 +71,11 @@ class TileMap():
     def to_map_position(self, position:tuple[int, int]) -> tuple[int, int]:
         x = int(position[0] / 20)
         y = int(position[1] / 20)
+        return x, y
+    
+    def map_position_to_normal_postion_center_of_tile(self, position:tuple[int, int]) -> tuple[int, int]:
+        x = int(position[0] * 20 + 20/2)
+        y = int(position[1] * 20 + 20/2)
         return x, y
 
     def create_tile(self, xy, raw_type):

@@ -34,16 +34,16 @@ class BasicEnemy(MovingGameObject):
 
             self.next_path_position = path[1]
 
-            direction_vector = (self.next_path_position[0] - x, self.next_path_position[1] - y)
+            next_position = map.map_position_to_normal_postion_center_of_tile(self.next_path_position)
+
+            direction_vector = (next_position[0] - self.rect.centerx, next_position[1] - self.rect.centery)
         
         norm = np.linalg.norm(direction_vector)
         if norm > 0:
             direction_vector = direction_vector / norm
-        else:
-            raise Exception("I don't know what went wrong here.")
 
-        if pygame.sprite.collide_rect(self, player):
-            direction_vector = (player.rect.x - self.rect.x, player.rect.y - self.rect.y)
-            self.weapon.shoot(self.rect.center, direction_vector)
-        else:
-            super().move(direction_vector, delta_time)
+            if pygame.sprite.collide_rect(self, player):
+                direction_vector = (player.rect.x - self.rect.x, player.rect.y - self.rect.y)
+                self.weapon.shoot(self.rect.center, direction_vector)
+            else:
+                super().move(direction_vector, delta_time, wall_collision=True)
