@@ -10,6 +10,7 @@ from keybindings import Keybindings
 from map import TileMap
 from player import Player
 from screens import Screen
+from input_handling import InputHandler
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s %(funcName)s: %(message)s',
@@ -46,20 +47,15 @@ class Pause(Screen):
         self.game = game
         self.parent_surface = game.main_surface
         self.keybindings = Keybindings()
+        self.input_handler = InputHandler()
 
     def resume_gameplay(self):
         self.game.active_screen = self.game.gameplay
 
-    def update(self, delta_time, pressed_keys, keydowns, joysticks):
-        if joysticks:
-            for joystick in joysticks:
-                if joystick.get_button(self.keybinding.controller['pause']):
-                    self.resume_gameplay()
-                    return
-        else:
-            if keydowns.get(self.keybindings.keyboard['pause']):
-                self.resume_gameplay()
-                return
+    def update(self, delta_time):
+        if self.input_handler.just_pressed('pause'):
+            self.resume_gameplay()
+            return
 
     def draw(self):
         surface = font.render(f"Paused, press <pause> to continue playing", True, BLACK)
@@ -71,6 +67,7 @@ class Gameplay(Screen):
         self.parent_surface = game.main_surface
         self.game = game
         self.keybindings = Keybindings()
+        self.input_handler = InputHandler()
 
         generate_map()
 
@@ -86,7 +83,6 @@ class Gameplay(Screen):
         self.players.add(self.player)
         self.enemies = pygame.sprite.Group()
         self.enemies.add(BasicEnemy(x=10, y=10))
-        
     
     def pause_gameplay(self):
         self.game.active_screen = Pause(self.game)
@@ -94,22 +90,16 @@ class Gameplay(Screen):
     def game_over(self):
         self.game.active_screen = GameOver(self.game, self.score)
 
-    def update(self, dt, keys, keydowns, joysticks):
-        if joysticks:
-            for joystick in joysticks:
-                if joystick.get_button(self.keybinding.controller['pause']):
-                    self.pause_gameplay()
-                    return
-        else:
-            if keydowns.get(self.keybindings.keyboard['pause']):
-                self.pause_gameplay()
-                return
+    def update(self, dt):
+        if self.input_handler.just_pressed('pause'):
+            self.pause_gameplay()
+            return
 
         # TODO: Determine what order things should evaluated in here.
         if not self.enemies:
             self.enemies.add(BasicEnemy(x=10, y=10))
 
-        self.player.update(keys, joysticks, self.tilemap, dt)
+        self.player.update(self.tilemap, dt)
 
         self.projectiles.update(dt, self.tilemap.walls, self.enemies, self.players)
         self.enemies.update(dt)
@@ -145,40 +135,25 @@ class Game:
         self.clock = pygame.time.Clock()
         self.last_time = pygame.time.get_ticks()
 
-        self.joysticks = []
         self.keybindings = Keybindings()
         self.keybindings.controller['attack'].add_binding('axis', 5)
         self.gameplay = Gameplay(self)
 
         self.active_screen:Screen = self.gameplay
+        self.input_handler = InputHandler()
     
     def run(self):
         while True:
-            keydowns = {}
-            for event in pygame.event.get():
-                if event.type == pygame.JOYDEVICEADDED:
-                    self.joysticks.append(pygame.joystick.Joystick(event.device_index))
-                    logging.info(f'Addded: {event}')
-                if event.type == pygame.JOYDEVICEREMOVED:
-                    logging.info(f'Should be removed: {event}')
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    keydowns[event.key] = True
-                    if event.key == self.keybindings.keyboard['attack']:
-                        logging.debug('Player should update shooting vector.')
-                        # player.update_shooting_vector()
-                    if event.key == self.keybindings.keyboard['exit']:
-                        pygame.quit()
-                        sys.exit()
+            self.input_handler.update()
+            if self.input_handler.just_pressed('exit'):
+                pygame.quit()
+                sys.exit()
 
-            pressed_keys = pygame.key.get_pressed()
             current_time = pygame.time.get_ticks()
             delta_time = (current_time - self.last_time) / 1000.0  # Convert to seconds
             self.last_time = current_time
 
-            self.active_screen.update(delta_time, pressed_keys, keydowns, self.joysticks)
+            self.active_screen.update(delta_time)
 
             self.main_surface.fill(BACKGROUND_COLOR)
 
