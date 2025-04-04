@@ -1,5 +1,6 @@
 from pygame.locals import (CONTROLLER_BUTTON_X, K_ESCAPE, K_SPACE, K_RETURN, K_a, K_d,
                            K_s, K_w, K_q)
+from utils import Singleton
 
 class JoystickInputBinding():
     def __init__(self, input_type:str, ids:list[int]|int):
@@ -30,7 +31,7 @@ class JoystickInputBinding():
         """
         return iter([(input_type, id) for input_type, ids in self.bindings.items() for id in ids])
 
-class Keybindings():
+class Keybindings(metaclass=Singleton):
     DEFAULT_KEYBOARD_KEYBINDINGS = {
         'move_left': K_a,
         'move_right': K_d,
@@ -45,11 +46,6 @@ class Keybindings():
         'attack': JoystickInputBinding('button', 0),
         'confirm': 0,
     }
-
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Keybindings, cls).__new__(cls)
-        return cls.instance
 
     def __init__(self):
         self.keyboard = Keybindings.DEFAULT_KEYBOARD_KEYBINDINGS.copy()
