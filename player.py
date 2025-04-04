@@ -7,6 +7,7 @@ import numpy as np
 from globals import Globals
 from entities import MovingGameObject
 from keybindings import Keybindings
+from input_handling import InputHandler
 
 class Player(MovingGameObject):
     def __init__(self, start_x:int=5, start_y:int=5):
@@ -15,8 +16,15 @@ class Player(MovingGameObject):
         self.shooting_vector = np.array([1.0, 0.0], dtype=float)
         self.weapon = Blaster()
         self.keybindings = Keybindings()
+        self.input_handler = InputHandler()
 
-    def update(self, pressed_keys, joysticks, tilemap, delta_time):
+    def update(self, tilemap, delta_time):
+        joysticks = self.input_handler.joysticks
+
+        if self.input_handler.just_pressed('attack'):
+            self.update_shooting_vector()
+
+        pressed_keys = self.input_handler.pressed_keys()
 
         if joysticks:
             # Controller input
@@ -32,11 +40,11 @@ class Player(MovingGameObject):
             
         else:   
             # Keyboard keys
-            left = pressed_keys[self.keybindings.keyboard['move_left']]
-            right = pressed_keys[self.keybindings.keyboard['move_right']]
-            up = pressed_keys[self.keybindings.keyboard['move_up']]
-            down = pressed_keys[self.keybindings.keyboard['move_down']]
-            attack = pressed_keys[self.keybindings.keyboard['attack']]
+            left = pressed_keys.get(self.keybindings.keyboard['move_left'])
+            right = pressed_keys.get(self.keybindings.keyboard['move_right'])
+            up = pressed_keys.get(self.keybindings.keyboard['move_up'])
+            down = pressed_keys.get(self.keybindings.keyboard['move_down'])
+            attack = pressed_keys.get(self.keybindings.keyboard['attack'])
             self._move_keyboard(tilemap, left, right, up, down, delta_time)
 
         if attack:
