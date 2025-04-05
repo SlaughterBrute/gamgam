@@ -26,11 +26,11 @@ class Tile(pygame.sprite.Sprite):
 
 class GrassTile(Tile):
     def __init__(self, x, y):
-        super().__init__('tiles/fabric', x, y)
+        super().__init__('tiles/off-white', x, y)
 
 class WallTile(Tile):
     def __init__(self, x, y):
-        super().__init__('tiles/fabric2', x, y, destructable=True, hitpoints=5, alpha=True)
+        super().__init__('tiles/red-ish', x, y, destructable=True, hitpoints=5, alpha=True)
     
     def kill(self):
         super().kill()
