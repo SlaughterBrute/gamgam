@@ -5,9 +5,9 @@ class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type: str, x: int, y: int, destructable:bool=False, hitpoints:int=1, alpha=False):
         super().__init__()
         if alpha:
-            self.image = pygame.image.load(f'{tile_type}.png').convert_alpha()
+            self.image = pygame.image.load(f'assets/images/{tile_type}.png').convert_alpha()
         else:
-            self.image = pygame.image.load(f'{tile_type}.png').convert()
+            self.image = pygame.image.load(f'assets/images/{tile_type}.png').convert()
         self.rect = pygame.Rect(0, 0, 20, 20)
         self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
         self.rect.left = x * self.rect.width
@@ -16,10 +16,7 @@ class Tile(pygame.sprite.Sprite):
         self.y = y
         self.destructable = destructable
         self.hitpoints = hitpoints
-    
-    def draw(self, surface:pygame.Surface):
-        surface.blit(self.image, self.rect)
-    
+
     def damage(self, damage:int):
         if self.destructable:
             self.hitpoints -= damage
@@ -29,11 +26,11 @@ class Tile(pygame.sprite.Sprite):
 
 class GrassTile(Tile):
     def __init__(self, x, y):
-        super().__init__('fabric', x, y)
+        super().__init__('tiles/fabric', x, y)
 
 class WallTile(Tile):
     def __init__(self, x, y):
-        super().__init__('fabric2', x, y, destructable=True, hitpoints=5, alpha=True)
+        super().__init__('tiles/fabric2', x, y, destructable=True, hitpoints=5, alpha=True)
     
     def kill(self):
         super().kill()

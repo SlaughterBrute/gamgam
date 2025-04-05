@@ -7,7 +7,7 @@ from weapons import Weapon
 
 class BasicEnemy(MovingGameObject):
     def __init__(self, *groups, x, y):
-        super().__init__(*groups, x=x, y=y, speed=20, size=10, image_path='Enemy.png', hitpoints=5)
+        super().__init__(*groups, x=x, y=y, speed=20, size=10, image_path='Enemy', hitpoints=5)
         attack_rate_per_second = 1
         self.weapon = Weapon(firing_rate_per_second=attack_rate_per_second)
 

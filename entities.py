@@ -15,7 +15,7 @@ class GameObject(pygame.sprite.Sprite):
             raise ValueError("Either 'size' or both 'width' and 'height' must be provided.")
 
         self.rect = pygame.rect.Rect(0, 0, self.width, self.height)
-        image = pygame.image.load(image_path).convert()
+        image = pygame.image.load(f'assets/images/{image_path}.png').convert()
         self.image = pygame.transform.scale(image, self.rect.size)
         self.rect.center = (x,y)
         self.position = np.array([self.rect.x, self.rect.y], dtype=float)

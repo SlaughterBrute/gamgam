@@ -59,4 +59,4 @@ class Projectile(MovingGameObject):
 
 class Bullet(Projectile):
     def __init__(self, x, y, direction):
-        super().__init__(x, y, direction, speed=150, damage=1, image_path='Bullet.png', hitpoints=10)
+        super().__init__(x, y, direction, speed=150, damage=1, image_path='Bullet', hitpoints=10)

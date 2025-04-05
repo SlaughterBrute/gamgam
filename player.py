@@ -11,7 +11,7 @@ from input_handling import InputHandler
 
 class Player(MovingGameObject):
     def __init__(self, start_x:int=5, start_y:int=5):
-        super().__init__(x=start_x, y=start_y, speed=40, image_path='Player.png', hitpoints=10, size=10)
+        super().__init__(x=start_x, y=start_y, speed=40, image_path='Player', hitpoints=10, size=10)
         self.last_movement_vector = np.array([1.0, 0.0], dtype=float)
         self.shooting_vector = np.array([1.0, 0.0], dtype=float)
         self.weapon = Blaster()
