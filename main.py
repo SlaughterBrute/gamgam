@@ -1,5 +1,6 @@
 import logging
 import sys
+import random
 
 import pygame
 
@@ -21,7 +22,7 @@ pygame.joystick.init()
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BACKGROUND_COLOR = (87, 203, 219) # 57cbdb
+BACKGROUND_COLOR = (116, 184, 222)
 
 WIDTH, HEIGHT = 420, 420
 Globals.add('WIDTH', WIDTH)
@@ -129,7 +130,9 @@ class Gameplay(Screen):
 
 class Game:
     def __init__(self):
-        self.main_surface = pygame.display.set_mode((800, 600))
+        self.width = 800
+        self.height = 600
+        self.main_surface = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("GamGam")
 
         self.clock = pygame.time.Clock()
@@ -141,7 +144,23 @@ class Game:
 
         self.active_screen:Screen = self.gameplay
         self.input_handler = InputHandler()
-    
+
+        self.init_decoration_surface()
+        
+    def init_decoration_surface(self):
+        self.decoration_surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        flower = pygame.image.load('assets/images/simple-flower.png').convert_alpha()
+        flower = pygame.transform.scale(flower, (12,12)) # Multiples of three, flower is 3x3 pixels
+        flower_rect = flower.get_rect()
+        width = self.decoration_surface.get_width()
+        height = self.decoration_surface.get_height()
+        for _ in range(50):
+            x = random.randint(0, width - flower_rect.width)
+            y = random.randint(0, height - flower_rect.height)
+            
+            flower_rect.topleft = (x, y)
+            self.decoration_surface.blit(flower, flower_rect)
+
     def run(self):
         while True:
             self.input_handler.update()
@@ -156,6 +175,7 @@ class Game:
             self.active_screen.update(delta_time)
 
             self.main_surface.fill(BACKGROUND_COLOR)
+            self.main_surface.blit(self.decoration_surface, (0,0))
 
             self.gameplay.draw()
             if not isinstance(self.active_screen, Gameplay):
